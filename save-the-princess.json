@@ -1,0 +1,12 @@
+{
+  "title": "Save The Princess",
+  "pages": [
+    {
+      "name": "introduction",
+      "content": "Long long ago, there was a princess who ruled over the people of Valeru. She was adored by her disciples for many years. However, one day the evil dragon Kreagore came and kidnapped the princess from the castle. The people were distraught, but a hero rose up to save her.",
+      "choices": [
+        {"name": "next", "page": "beginning"}
+      ]
+    }
+  ]
+}
