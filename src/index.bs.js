@@ -2,14 +2,25 @@
 'use strict';
 
 var Json = require("@glennsl/bs-json/src/Json.bs.js");
+var Curry = require("bs-platform/lib/js/curry.js");
 var Morrow$ReMorrow = require("./morrow.bs.js");
 
 var bookString = Morrow$ReMorrow.Read[/* file */0]("save-the-princess.json");
 
-var exampleBook = Morrow$ReMorrow.Parser[/* parseBook */2](Json.parseOrRaise(bookString));
+var exampleBook = Morrow$ReMorrow.recreateBook(Morrow$ReMorrow.Parser[/* parseBook */2](Json.parseOrRaise(bookString)));
 
-console.log(exampleBook[/* title */0]);
+var CreatedBook = /* module */[/* book */exampleBook];
+
+var CurrentBook = Morrow$ReMorrow.MakeBook(CreatedBook);
+
+console.log(CurrentBook[/* title */1]);
+
+console.log(Curry._1(CurrentBook[/* pageContents */4], "introduction"));
+
+Curry._1(CurrentBook[/* printBook */6], /* () */0);
 
 exports.bookString = bookString;
 exports.exampleBook = exampleBook;
+exports.CreatedBook = CreatedBook;
+exports.CurrentBook = CurrentBook;
 /* bookString Not a pure module */

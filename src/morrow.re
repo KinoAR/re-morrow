@@ -5,12 +5,12 @@ type page = {
 }
 and choice = {
   name:string,
-  page:page,
+  page:string,
 };
 
 type book = {
   title:string,
-  pages: array(page)
+  pages: list(page)
 }
 
 type choiceData = {
@@ -21,30 +21,56 @@ type choiceData = {
 type pageData = {
   name: string,
   content: string,
-  choices: list(choiceData),
+  choicesData: list(choiceData),
 };
 
 type bookData = {
   title:string,
-  pages: list(pageData)
+  pagesData: list(pageData)
 };
 
 module Page = {
   type t = page;
-  let pageName = (page) => page.name;
-  let pageContent = (page) => page.content;
-  let pageChoices = (page) => page.choices;
+  let pageName = (page:t) => page.name;
+  let pageContent = (page:t) => page.content;
+  let pageChoices = (page:t) => page.choices;
   let choiceByName = (choiceName) => {
-    List.find(choice => choice.name == choiceName);
+    List.find((choice:choice) => choice.name == choiceName);
   };
 };
 
 module Choice = {
   type t = choice;
-  let choiceName = (choice) => choice.name;
+  let choiceName = (choice:choice) => choice.name;
   let page = (choice) => {
     choice.page;
   };
+};
+
+module type Book = {
+  let book:book;
+};
+
+module MakeBook = (Item:Book) => {
+  let book = Item.book;
+  let title = Item.book.title;
+  let length = Item.book.pages -> List.length
+  let pageByName = (name) => {
+    List.find(page => name == Page.pageName(page), book.pages);
+  };
+
+  let pageContents = (name) => name -> pageByName -> Page.pageContent;
+
+  let takeChoice = (choice) => {
+    pageByName(choice.page);
+  };
+
+  let printBook = () => {
+    let book = Item.book;
+    print_endline("Title: " ++ book.title);
+    print_endline("Book Length: " ++ string_of_int(length));
+    print_endline("Ratings: " ++ "Some Rating");
+  }
 };
 
 module Parser = {
@@ -59,14 +85,14 @@ module Parser = {
     Json.Decode.{
       name: json |> field("name", string),
       content: json |> field("content", string),
-      choices: json |> field("choices", list(parseChoice))
+      choicesData: json |> field("choices", list(parseChoice))
     }
   };
 
   let parseBook = (json) => {
     Json.Decode.{
       title: json |> field("title", string),
-      pages: json |> field("pages", list(parsePage))
+      pagesData: json |> field("pages", list(parsePage))
     }
   };
 }
@@ -78,3 +104,17 @@ module Read  = {
 
   let fileJson = (fileName) => fileName -> file -> Js.Json.string
 };
+
+let recreateBook = (data) => {
+  {
+    title: data.title,
+    pages: List.map((pageData) => {
+      name: pageData.name,
+      content: pageData.content,
+      choices: List.map((choiceData:choiceData) => {
+        name:choiceData.name,
+        page:  choiceData.pageName
+      }, pageData.choicesData)
+    }, data.pagesData)
+  }
+}

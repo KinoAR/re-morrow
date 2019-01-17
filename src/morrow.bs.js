@@ -46,6 +46,39 @@ var Choice = /* module */[
   /* page */page
 ];
 
+function MakeBook(Item) {
+  var book = Item[/* book */0];
+  var title = Item[/* book */0][/* title */0];
+  var length = List.length(Item[/* book */0][/* pages */1]);
+  var pageByName = function (name) {
+    return List.find((function (page) {
+                  return name === page[/* name */0];
+                }), book[/* pages */1]);
+  };
+  var pageContents = function (name) {
+    return pageByName(name)[/* content */1];
+  };
+  var takeChoice = function (choice) {
+    return pageByName(choice[/* page */1]);
+  };
+  var printBook = function (param) {
+    var book = Item[/* book */0];
+    console.log("Title: " + book[/* title */0]);
+    console.log("Book Length: " + String(length));
+    console.log("Ratings: Some Rating");
+    return /* () */0;
+  };
+  return /* module */[
+          /* book */book,
+          /* title */title,
+          /* length */length,
+          /* pageByName */pageByName,
+          /* pageContents */pageContents,
+          /* takeChoice */takeChoice,
+          /* printBook */printBook
+        ];
+}
+
 function parseChoice(json) {
   return /* record */[
           /* name */Json_decode.field("name", Json_decode.string, json),
@@ -57,7 +90,7 @@ function parsePage(json) {
   return /* record */[
           /* name */Json_decode.field("name", Json_decode.string, json),
           /* content */Json_decode.field("content", Json_decode.string, json),
-          /* choices */Json_decode.field("choices", (function (param) {
+          /* choicesData */Json_decode.field("choices", (function (param) {
                   return Json_decode.list(parseChoice, param);
                 }), json)
         ];
@@ -66,7 +99,7 @@ function parsePage(json) {
 function parseBook(json) {
   return /* record */[
           /* title */Json_decode.field("title", Json_decode.string, json),
-          /* pages */Json_decode.field("pages", (function (param) {
+          /* pagesData */Json_decode.field("pages", (function (param) {
                   return Json_decode.list(parsePage, param);
                 }), json)
         ];
@@ -91,8 +124,28 @@ var Read = /* module */[
   /* fileJson */fileJson
 ];
 
+function recreateBook(data) {
+  return /* record */[
+          /* title */data[/* title */0],
+          /* pages */List.map((function (pageData) {
+                  return /* record */[
+                          /* name */pageData[/* name */0],
+                          /* content */pageData[/* content */1],
+                          /* choices */List.map((function (choiceData) {
+                                  return /* record */[
+                                          /* name */choiceData[/* name */0],
+                                          /* page */choiceData[/* pageName */1]
+                                        ];
+                                }), pageData[/* choicesData */2])
+                        ];
+                }), data[/* pagesData */1])
+        ];
+}
+
 exports.Page = Page;
 exports.Choice = Choice;
+exports.MakeBook = MakeBook;
 exports.Parser = Parser;
 exports.Read = Read;
+exports.recreateBook = recreateBook;
 /* fs Not a pure module */
