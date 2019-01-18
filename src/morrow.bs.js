@@ -2,6 +2,7 @@
 'use strict';
 
 var Fs = require("fs");
+var Json = require("@glennsl/bs-json/src/Json.bs.js");
 var List = require("bs-platform/lib/js/list.js");
 var Path = require("path");
 var Json_decode = require("@glennsl/bs-json/src/Json_decode.bs.js");
@@ -18,12 +19,10 @@ function pageChoices(page) {
   return page[/* choices */2];
 }
 
-function choiceByName(choiceName) {
-  return (function (param) {
-      return List.find((function (choice) {
-                    return choice[/* name */0] === choiceName;
-                  }), param);
-    });
+function choiceByName(choiceName, page) {
+  return List.find((function (choice) {
+                return choice[/* name */0] === choiceName;
+              }), page[/* choices */2]);
 }
 
 var Page = /* module */[
@@ -61,6 +60,12 @@ function MakeBook(Item) {
   var takeChoice = function (choice) {
     return pageByName(choice[/* page */1]);
   };
+  var printChoices = function (page) {
+    return List.iter((function (choice) {
+                  console.log("Choice:" + choice[/* name */0]);
+                  return /* () */0;
+                }), page[/* choices */2]);
+  };
   var printBook = function (param) {
     var book = Item[/* book */0];
     console.log("Title: " + book[/* title */0]);
@@ -75,6 +80,7 @@ function MakeBook(Item) {
           /* pageByName */pageByName,
           /* pageContents */pageContents,
           /* takeChoice */takeChoice,
+          /* printChoices */printChoices,
           /* printBook */printBook
         ];
 }
@@ -142,10 +148,15 @@ function recreateBook(data) {
         ];
 }
 
+function recreateBookFromString(string) {
+  return recreateBook(parseBook(Json.parseOrRaise(string)));
+}
+
 exports.Page = Page;
 exports.Choice = Choice;
 exports.MakeBook = MakeBook;
 exports.Parser = Parser;
 exports.Read = Read;
 exports.recreateBook = recreateBook;
+exports.recreateBookFromString = recreateBookFromString;
 /* fs Not a pure module */

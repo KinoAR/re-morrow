@@ -34,8 +34,8 @@ module Page = {
   let pageName = (page:t) => page.name;
   let pageContent = (page:t) => page.content;
   let pageChoices = (page:t) => page.choices;
-  let choiceByName = (choiceName) => {
-    List.find((choice:choice) => choice.name == choiceName);
+  let choiceByName = (choiceName, page) => {
+    List.find((choice:choice) => choice.name == choiceName, page.choices);
   };
 };
 
@@ -60,10 +60,16 @@ module MakeBook = (Item:Book) => {
   };
 
   let pageContents = (name) => name -> pageByName -> Page.pageContent;
-
+  
   let takeChoice = (choice) => {
     pageByName(choice.page);
   };
+
+  let printChoices = (page:page) => {
+    List.iter((choice:choice) => {
+      print_endline("Choice:" ++ choice.name)
+    }, page.choices) 
+  }
 
   let printBook = () => {
     let book = Item.book;
@@ -117,4 +123,8 @@ let recreateBook = (data) => {
       }, pageData.choicesData)
     }, data.pagesData)
   }
+}
+
+let recreateBookFromString = (string) => {
+  string -> Json.parseOrRaise -> Parser.parseBook -> recreateBook
 }

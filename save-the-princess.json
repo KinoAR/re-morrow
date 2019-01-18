@@ -7,6 +7,13 @@
       "choices": [
         {"name": "next", "page": "beginning"}
       ]
+    },
+    {
+      "name": "beginning",
+      "content": "So the brave youth began to look into the disappearance of their princess.",
+      "choices": [
+        {"name": "previous", "page": "introduction"}
+      ]
     }
   ]
 }
